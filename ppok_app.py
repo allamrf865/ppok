@@ -128,6 +128,24 @@ spirometry_severity = spirometry_classification(fev1_percentage)
 # Show severity classifications
 st.write(f"MRC Classification: {mrc_severity}")
 st.write(f"Spirometry Classification: {spirometry_severity}")
+# Add Watermark in Streamlit UI
+st.markdown(
+    """
+    <style>
+        .watermark {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+    <div class="watermark">
+        Created by Allam Rafi FKUI 2022
+    </div>
+    """, unsafe_allow_html=True)
 
 # Button for prediction
 if st.button('Predict COPD'):
