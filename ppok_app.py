@@ -141,8 +141,12 @@ def plot_heatmap(data):
     plt.title("Correlation Heatmap of Features")
     st.pyplot(plt)
 
-# Function to plot network analysis with centrality measures
-def plot_network(symptoms_data):
+import matplotlib.pyplot as plt
+import networkx as nx
+import pandas as pd
+
+# Function to plot a bar chart for degree, betweenness, and closeness centrality
+def plot_network_analysis(symptoms_data):
     G = nx.Graph()
 
     # Add nodes for symptoms and treatments
@@ -166,18 +170,49 @@ def plot_network(symptoms_data):
     betweenness = nx.betweenness_centrality(G)
     closeness = nx.closeness_centrality(G)
 
-    # Visualize the network
-    plt.figure(figsize=(10, 8))
-    pos = nx.spring_layout(G)  # Layout for better visualization
-    nx.draw(G, pos, with_labels=True, node_size=3000, node_color='lightblue', font_size=12, font_weight='bold')
+    # Convert the centrality metrics to DataFrame for better visualization
+    centrality_data = pd.DataFrame({
+        'Node': list(G.nodes),
+        'Degree': [degree[node] for node in G.nodes],
+        'Betweenness Centrality': [betweenness[node] for node in G.nodes],
+        'Closeness Centrality': [closeness[node] for node in G.nodes]
+    })
 
-    # Show degree, betweenness, and closeness on the plot
-    for node in G.nodes():
-        plt.text(pos[node][0], pos[node][1], f"{node}\nDegree: {degree[node]}\nBetweenness: {betweenness[node]:.2f}\nCloseness: {closeness[node]:.2f}", 
-                 fontsize=10, color='black', ha='center', bbox=dict(facecolor='white', alpha=0.7))
+    # Plotting the bar charts
+    fig, ax = plt.subplots(1, 3, figsize=(18, 6))
 
-    plt.title("Network Analysis of Symptoms and Treatments with Centrality Measures")
-    st.pyplot(plt)
+    # Degree
+    ax[0].bar(centrality_data['Node'], centrality_data['Degree'], color='lightblue')
+    ax[0].set_title("Degree Centrality")
+    ax[0].set_xlabel("Nodes")
+    ax[0].set_ylabel("Degree")
+
+    # Betweenness
+    ax[1].bar(centrality_data['Node'], centrality_data['Betweenness Centrality'], color='lightgreen')
+    ax[1].set_title("Betweenness Centrality")
+    ax[1].set_xlabel("Nodes")
+    ax[1].set_ylabel("Betweenness")
+
+    # Closeness
+    ax[2].bar(centrality_data['Node'], centrality_data['Closeness Centrality'], color='salmon')
+    ax[2].set_title("Closeness Centrality")
+    ax[2].set_xlabel("Nodes")
+    ax[2].set_ylabel("Closeness")
+
+    plt.tight_layout()
+    st.pyplot(fig)
+
+    # Interpretation of Centrality Measures
+    st.write("""
+    ### Interpretation of Centrality Measures:
+    - **Degree Centrality**: Represents the number of connections a node has. The higher the degree, the more connected the node is.
+    - **Betweenness Centrality**: Indicates how often a node appears on the shortest path between other nodes. Higher values mean the node serves as a bridge between other nodes.
+    - **Closeness Centrality**: Measures how close a node is to all other nodes. Higher values indicate that the node can reach others more quickly.
+    """)
+
+# Display the network analysis of symptoms and treatments
+st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
+plot_network_analysis(data_cleaned)
 
 # Function for behavioral analysis visualization
 def behavioral_analysis(symptoms_data):
