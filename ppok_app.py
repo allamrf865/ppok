@@ -3,10 +3,11 @@ import numpy as np
 import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
 import networkx as nx
+import pickle
+
 
 # Function to preprocess and clean the dataset
 def preprocess_data(data):
@@ -201,8 +202,22 @@ if st.button('Predict COPD'):
     st.write("3. If suspected alpha-1-antitrypsin deficiency.")
     st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
 
-import seaborn as sns
-import matplotlib.pyplot as plt
+# Visualizations - Heatmap, Network Analysis, Behavioral Analysis
+
+    # Heatmap Visualization (displayed after prediction)
+    if diagnosis:
+        st.subheader("Heatmap of Correlations")
+        plot_heatmap(data_cleaned)
+
+    # Network Analysis Visualization (displayed after prediction)
+    if diagnosis:
+        st.subheader("Network Analysis of Symptoms and Treatments")
+        plot_network(data_cleaned)
+
+    # Behavioral Analysis Visualization (displayed after prediction)
+    if diagnosis:
+        st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
+        behavioral_analysis(data_cleaned)
 
 # Function to plot heatmap of correlations
 def plot_heatmap(data):
@@ -211,12 +226,6 @@ def plot_heatmap(data):
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
     plt.title("Correlation Heatmap of Features")
     st.pyplot(plt)
-
-# Display heatmap of cleaned data
-st.subheader("Heatmap of Correlations")
-plot_heatmap(data_cleaned)
-
-import networkx as nx
 
 # Function to plot a network of symptoms and treatments
 def plot_network(symptoms_data):
@@ -238,19 +247,23 @@ def plot_network(symptoms_data):
                       ('Wheezing', 'Oxygen Therapy'),
                       ('Fatigue', 'Smoking Cessation')])
 
-    # Visualize the network
+    # Calculate degree, betweenness, and closeness centrality
+    degree = dict(G.degree())
+    betweenness = nx.betweenness_centrality(G)
+    closeness = nx.closeness_centrality(G)
+
+    # Visualize the network with centrality measures
     plt.figure(figsize=(10, 8))
     pos = nx.spring_layout(G)  # Layout for better visualization
     nx.draw(G, pos, with_labels=True, node_size=3000, node_color='lightblue', font_size=12, font_weight='bold')
-    plt.title("Network Analysis of Symptoms and Treatments")
+
+    # Show degree, betweenness, and closeness on the plot
+    for node in G.nodes():
+        plt.text(pos[node][0], pos[node][1], f"{node}\nDegree: {degree[node]}\nBetweenness: {betweenness[node]:.2f}\nCloseness: {closeness[node]:.2f}", 
+                 fontsize=10, color='black', ha='center', bbox=dict(facecolor='white', alpha=0.7))
+
+    plt.title("Network Analysis of Symptoms and Treatments with Centrality Measures")
     st.pyplot(plt)
-
-# Display the network analysis of symptoms and treatments
-st.subheader("Network Analysis of Symptoms and Treatments")
-plot_network(symptoms)
-
-import pandas as pd
-import matplotlib.pyplot as plt
 
 # Function for behavioral analysis visualization
 def behavioral_analysis(symptoms_data):
@@ -265,6 +278,6 @@ def behavioral_analysis(symptoms_data):
     plt.ylabel("Frequency")
     st.pyplot(plt)
 
-# Run behavioral analysis for visualization
-st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
-behavioral_analysis(data_cleaned)
+# Run the application
+if __name__ == "__main__":
+    st.write("Start Application")
