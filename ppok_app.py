@@ -304,10 +304,18 @@ st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
 plot_network_analysis(data_cleaned)
 
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 # Function for behavioral analysis visualization
 def behavioral_analysis(symptoms_data):
-    # Create a simple behavioral score based on smoking and physical activity
-    symptoms_data['Behavioral Score'] = (symptoms_data['smoker'] * 2) + (symptoms_data['activity_limit'] * 1)
+    # Assuming smoking is binary (1 = smoker, 0 = non-smoker)
+    # Assuming activity_limit can be inferred from 'MWT1' and 'MWT2', or you could use 'SGRQ'
+    # Here, I'll use 'MWT1' or 'MWT2' to define activity limitations, assuming lower values = more limitation
+
+    # Create a simple behavioral score based on smoking and physical activity limitation
+    symptoms_data['Activity Limit Score'] = np.where(symptoms_data['MWT1'] < 100, 1, 0)  # This is an example
+    symptoms_data['Behavioral Score'] = (symptoms_data['smoking'] * 2) + (symptoms_data['Activity Limit Score'] * 1)
 
     # Plotting the distribution of behavioral scores
     plt.figure(figsize=(10, 6))
@@ -317,6 +325,7 @@ def behavioral_analysis(symptoms_data):
     plt.ylabel("Frequency")
     st.pyplot(plt)
 
-# Run the application
-if __name__ == "__main__":
-    st.write("Start Application")
+# Run the behavioral analysis visualization
+st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
+behavioral_analysis(data_cleaned)
+
