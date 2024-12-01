@@ -128,99 +128,10 @@ spirometry_severity = spirometry_classification(fev1_percentage)
 
 # Show severity classifications
 st.write(f"MRC Classification: {mrc_severity}")
-st.write(f"Spirometry Classification: {spirometry_severity}")
-# Add Watermark in Streamlit UI
-st.markdown(
-    """
-    <style>
-        .watermark {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            font-size: 12px;
-            color: rgba(0, 0, 0, 0.5);
-            font-weight: bold;
-            z-index: 1000;
-        }
-    </style>
-    <div class="watermark">
-        Created by Allam Rafi FKUI 2022
-    </div>
-    """, unsafe_allow_html=True)
-
-# Button for prediction
-if st.button('Predict COPD'):
-    diagnosis = predict_copd(symptoms, mrc_grade, fev1_percentage)
-    st.write(diagnosis)
-
-    # Management recommendations based on risk
-    st.header('Management Recommendations')
-
-    if diagnosis == "High Risk: COPD Likely":
-        st.write("1. Refer to a pulmonologist for further evaluation.")
-        st.write("2. Consider spirometry test for definitive diagnosis.")
-        st.write("3. Start pharmacological treatment (e.g., corticosteroids, inhalers).")
-        st.write("4. Encourage smoking cessation and regular physical activity.")
-        st.write("5. Consider long-term oxygen therapy if SpO2 < 90% at rest.")
-
-    elif diagnosis == "Moderate Risk: Further Evaluation Needed":
-        st.write("1. Monitor symptoms and repeat screening if necessary.")
-        st.write("2. Encourage lifestyle changes: stop smoking, increase physical activity.")
-        st.write("3. Vaccination for influenza and pneumonia.")
-        
-    else:
-        st.write("1. Encourage healthy lifestyle choices.")
-        st.write("2. Regular monitoring and follow-up if necessary.")
-
-    # Non-pharmacologic recommendations
-    st.subheader("Non-Pharmacologic Management:")
-    st.write("1. **Education**: Teach patient about COPD and self-management strategies.")
-    st.write("2. **Smoking Cessation**: Essential to slowing disease progression.")
-    st.write("3. **Avoidance of Risk Factors**: Reduce exposure to irritants (e.g., air pollution).")
-    st.write("4. **Energy Conservation**: Manage daily activities to avoid excessive fatigue.")
-    st.write("5. **Palliative Care**: For progressive disease, provide support for patient and family.")
-    
-    # Pharmacologic management recommendations
-    st.subheader("Pharmacologic Management:")
-    st.write("1. **Bronchodilators**: Primary treatment for relieving shortness of breath.")
-    st.write("2. **Combination ICS and LABA**: For moderate to severe COPD, reduces inflammation.")
-    st.write("3. **Oxygen Therapy**: For chronic hypoxemia, improves life expectancy and quality of life.")
-    st.write("4. **Vaccination**: Influenza and pneumococcal vaccines to prevent infections.")
-    st.write("5. **Antibiotics**: Prescribed if bacterial infection is suspected during acute exacerbation.")
-
-    # Acute exacerbation management
-    st.subheader("Acute Exacerbation Management:")
-    st.write("1. **Oxygen Therapy**: To increase oxygen levels in the blood.")
-    st.write("2. **Inhaled Bronchodilators**: To relieve bronchospasm.")
-    st.write("3. **Systemic Corticosteroids**: To reduce inflammation.")
-    st.write("4. **Antibiotics**: If bacterial infection is suspected.")
-    
-   # Referral to Specialist
-    st.subheader("Referral to Specialist:")
-    st.write("1. If unsure about diagnosis or if symptoms don't match level of airway obstruction.")
-    st.write("2. If rapid decline in lung function occurs (e.g., FEV1 decreases by >80 ml/year).")
-    st.write("3. If suspected alpha-1-antitrypsin deficiency.")
-    st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-# Function to plot heatmap of correlations
-def plot_heatmap(data):
-    if data is not None:
-        corr = data.corr()  # Calculate correlation matrix
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
-        plt.title("Correlation Heatmap of Features")
-        st.pyplot(plt)
-    else:
-        st.error("Data is not available for generating heatmap.")
-
-# Display heatmap of cleaned data only after prediction
-if diagnosis:
-    st.subheader("Heatmap of Correlations")
-    plot_heatmap(data_cleaned)
-
+import networkx as nx
 
 # Function to plot heatmap of correlations
 def plot_heatmap(data):
@@ -230,12 +141,8 @@ def plot_heatmap(data):
     plt.title("Correlation Heatmap of Features")
     st.pyplot(plt)
 
-import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
-
-# Function to plot a bar chart for degree, betweenness, and closeness centrality
-def plot_network_analysis(symptoms_data):
+# Function to plot network analysis with centrality measures
+def plot_network(symptoms_data):
     G = nx.Graph()
 
     # Add nodes for symptoms and treatments
@@ -259,61 +166,22 @@ def plot_network_analysis(symptoms_data):
     betweenness = nx.betweenness_centrality(G)
     closeness = nx.closeness_centrality(G)
 
-    # Convert the centrality metrics to DataFrame for better visualization
-    centrality_data = pd.DataFrame({
-        'Node': list(G.nodes),
-        'Degree': [degree[node] for node in G.nodes],
-        'Betweenness Centrality': [betweenness[node] for node in G.nodes],
-        'Closeness Centrality': [closeness[node] for node in G.nodes]
-    })
+    # Visualize the network
+    plt.figure(figsize=(10, 8))
+    pos = nx.spring_layout(G)  # Layout for better visualization
+    nx.draw(G, pos, with_labels=True, node_size=3000, node_color='lightblue', font_size=12, font_weight='bold')
 
-    # Plotting the bar charts
-    fig, ax = plt.subplots(1, 3, figsize=(18, 6))
+    # Show degree, betweenness, and closeness on the plot
+    for node in G.nodes():
+        plt.text(pos[node][0], pos[node][1], f"{node}\nDegree: {degree[node]}\nBetweenness: {betweenness[node]:.2f}\nCloseness: {closeness[node]:.2f}", 
+                 fontsize=10, color='black', ha='center', bbox=dict(facecolor='white', alpha=0.7))
 
-    # Degree
-    ax[0].bar(centrality_data['Node'], centrality_data['Degree'], color='lightblue')
-    ax[0].set_title("Degree Centrality")
-    ax[0].set_xlabel("Nodes")
-    ax[0].set_ylabel("Degree")
-
-    # Betweenness
-    ax[1].bar(centrality_data['Node'], centrality_data['Betweenness Centrality'], color='lightgreen')
-    ax[1].set_title("Betweenness Centrality")
-    ax[1].set_xlabel("Nodes")
-    ax[1].set_ylabel("Betweenness")
-
-    # Closeness
-    ax[2].bar(centrality_data['Node'], centrality_data['Closeness Centrality'], color='salmon')
-    ax[2].set_title("Closeness Centrality")
-    ax[2].set_xlabel("Nodes")
-    ax[2].set_ylabel("Closeness")
-
-    plt.tight_layout()
-    st.pyplot(fig)
-
-    # Interpretation of Centrality Measures
-    st.write("""
-    ### Interpretation of Centrality Measures:
-    - **Degree Centrality**: Represents the number of connections a node has. The higher the degree, the more connected the node is.
-    - **Betweenness Centrality**: Indicates how often a node appears on the shortest path between other nodes. Higher values mean the node serves as a bridge between other nodes.
-    - **Closeness Centrality**: Measures how close a node is to all other nodes. Higher values indicate that the node can reach others more quickly.
-    """)
-
-# Display the network analysis of symptoms and treatments
-st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
-plot_network_analysis(data_cleaned)
-
-
-import matplotlib.pyplot as plt
-import seaborn as sns
+    plt.title("Network Analysis of Symptoms and Treatments with Centrality Measures")
+    st.pyplot(plt)
 
 # Function for behavioral analysis visualization
 def behavioral_analysis(symptoms_data):
-    # Assuming smoking is binary (1 = smoker, 0 = non-smoker)
-    # Assuming activity_limit can be inferred from 'MWT1' and 'MWT2', or you could use 'SGRQ'
-    # Here, I'll use 'MWT1' or 'MWT2' to define activity limitations, assuming lower values = more limitation
-
-    # Create a simple behavioral score based on smoking and physical activity limitation
+    # Create a simple behavioral score based on smoking and physical activity
     symptoms_data['Activity Limit Score'] = np.where(symptoms_data['MWT1'] < 100, 1, 0)  # This is an example
     symptoms_data['Behavioral Score'] = (symptoms_data['smoking'] * 2) + (symptoms_data['Activity Limit Score'] * 1)
 
@@ -325,7 +193,83 @@ def behavioral_analysis(symptoms_data):
     plt.ylabel("Frequency")
     st.pyplot(plt)
 
-# Run the behavioral analysis visualization
-st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
-behavioral_analysis(data_cleaned)
+# After "Predict" button, visualize results
+if st.button('Predict COPD'):
+    diagnosis = predict_copd(symptoms, mrc_grade, fev1_percentage)
+    st.write(diagnosis)
+
+    # Management recommendations based on risk
+    st.header('Management Recommendations')
+    if diagnosis == "High Risk: COPD Likely":
+        st.write("1. Refer to a pulmonologist for further evaluation.")
+        st.write("2. Consider spirometry test for definitive diagnosis.")
+        st.write("3. Start pharmacological treatment (e.g., corticosteroids, inhalers).")
+        st.write("4. Encourage smoking cessation and regular physical activity.")
+        st.write("5. Consider long-term oxygen therapy if SpO2 < 90% at rest.")
+    elif diagnosis == "Moderate Risk: Further Evaluation Needed":
+        st.write("1. Monitor symptoms and repeat screening if necessary.")
+        st.write("2. Encourage lifestyle changes: stop smoking, increase physical activity.")
+        st.write("3. Vaccination for influenza and pneumonia.")
+    else:
+        st.write("1. Encourage healthy lifestyle choices.")
+        st.write("2. Regular monitoring and follow-up if necessary.")
+    
+    # Non-pharmacologic recommendations
+    st.subheader("Non-Pharmacologic Management:")
+    st.write("1. **Education**: Teach patient about COPD and self-management strategies.")
+    st.write("2. **Smoking Cessation**: Essential to slowing disease progression.")
+    st.write("3. **Avoidance of Risk Factors**: Reduce exposure to irritants (e.g., air pollution).")
+    st.write("4. **Energy Conservation**: Manage daily activities to avoid excessive fatigue.")
+    st.write("5. **Palliative Care**: For progressive disease, provide support for patient and family.")
+    
+    # Pharmacologic management recommendations
+    st.subheader("Pharmacologic Management:")
+    st.write("1. **Bronchodilators**: Primary treatment for relieving shortness of breath.")
+    st.write("2. **Combination ICS and LABA**: For moderate to severe COPD, reduces inflammation.")
+    st.write("3. **Oxygen Therapy**: For chronic hypoxemia, improves life expectancy and quality of life.")
+    st.write("4. **Vaccination**: Influenza and pneumococcal vaccines to prevent infections.")
+    st.write("5. **Antibiotics**: Prescribed if bacterial infection is suspected during acute exacerbation.")
+
+    # Acute exacerbation management
+    st.subheader("Acute Exacerbation Management:")
+    st.write("1. **Oxygen Therapy**: To increase oxygen levels in the blood.")
+    st.write("2. **Inhaled Bronchodilators**: To relieve bronchospasm.")
+    st.write("3. **Systemic Corticosteroids**: To reduce inflammation.")
+    st.write("4. **Antibiotics**: If bacterial infection is suspected.")
+    
+    # Referral to Specialist
+    st.subheader("Referral to Specialist:")
+    st.write("1. If unsure about diagnosis or if symptoms don't match level of airway obstruction.")
+    st.write("2. If rapid decline in lung function occurs (e.g., FEV1 decreases by >80 ml/year).")
+    st.write("3. If suspected alpha-1-antitrypsin deficiency.")
+    st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
+
+    # Now, only show the visualizations if diagnosis is made
+    st.subheader("Heatmap of Correlations")
+    plot_heatmap(data_cleaned)
+
+    st.subheader("Network Analysis of Symptoms and Treatments")
+    plot_network(data_cleaned)
+
+    st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
+    behavioral_analysis(data_cleaned)
+
+    # Add Watermark
+    st.markdown(
+        """
+        <style>
+            .watermark {
+                position: fixed;
+                bottom: 5%;
+                right: 5%;
+                font-size: 14px;
+                color: rgba(0, 0, 0, 0.5);
+                font-weight: bold;
+                z-index: 1000;
+            }
+        </style>
+        <div class="watermark">
+            Created by Allam Rafi FKUI 2022
+        </div>
+        """, unsafe_allow_html=True)
 
