@@ -202,22 +202,25 @@ if st.button('Predict COPD'):
     st.write("3. If suspected alpha-1-antitrypsin deficiency.")
     st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
 
-# Visualizations - Heatmap, Network Analysis, Behavioral Analysis
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-    # Heatmap Visualization (displayed after prediction)
-    if diagnosis:
-        st.subheader("Heatmap of Correlations")
-        plot_heatmap(data_cleaned)
+# Function to plot heatmap of correlations
+def plot_heatmap(data):
+    if data is not None:
+        corr = data.corr()  # Calculate correlation matrix
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+        plt.title("Correlation Heatmap of Features")
+        st.pyplot(plt)
+    else:
+        st.error("Data is not available for generating heatmap.")
 
-    # Network Analysis Visualization (displayed after prediction)
-    if diagnosis:
-        st.subheader("Network Analysis of Symptoms and Treatments")
-        plot_network(data_cleaned)
+# Display heatmap of cleaned data only after prediction
+if diagnosis:
+    st.subheader("Heatmap of Correlations")
+    plot_heatmap(data_cleaned)
 
-    # Behavioral Analysis Visualization (displayed after prediction)
-    if diagnosis:
-        st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
-        behavioral_analysis(data_cleaned)
 
 # Function to plot heatmap of correlations
 def plot_heatmap(data):
