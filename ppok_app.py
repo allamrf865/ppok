@@ -200,3 +200,71 @@ if st.button('Predict COPD'):
     st.write("2. If rapid decline in lung function occurs (e.g., FEV1 decreases by >80 ml/year).")
     st.write("3. If suspected alpha-1-antitrypsin deficiency.")
     st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Function to plot heatmap of correlations
+def plot_heatmap(data):
+    corr = data.corr()  # Calculate correlation matrix
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+    plt.title("Correlation Heatmap of Features")
+    st.pyplot(plt)
+
+# Display heatmap of cleaned data
+st.subheader("Heatmap of Correlations")
+plot_heatmap(data_cleaned)
+
+import networkx as nx
+
+# Function to plot a network of symptoms and treatments
+def plot_network(symptoms_data):
+    G = nx.Graph()
+
+    # Add nodes for symptoms and treatments
+    symptoms = ['Shortness of Breath', 'Cough', 'Sputum Production', 'Wheezing', 'Fatigue']
+    treatments = ['Bronchodilator', 'ICS/LABA', 'Oxygen Therapy', 'Smoking Cessation', 'Pneumonia Vaccine']
+
+    for symptom in symptoms:
+        G.add_node(symptom, type='symptom')
+    for treatment in treatments:
+        G.add_node(treatment, type='treatment')
+
+    # Add edges based on correlations or associations
+    G.add_edges_from([('Shortness of Breath', 'Bronchodilator'),
+                      ('Cough', 'Bronchodilator'),
+                      ('Sputum Production', 'ICS/LABA'),
+                      ('Wheezing', 'Oxygen Therapy'),
+                      ('Fatigue', 'Smoking Cessation')])
+
+    # Visualize the network
+    plt.figure(figsize=(10, 8))
+    pos = nx.spring_layout(G)  # Layout for better visualization
+    nx.draw(G, pos, with_labels=True, node_size=3000, node_color='lightblue', font_size=12, font_weight='bold')
+    plt.title("Network Analysis of Symptoms and Treatments")
+    st.pyplot(plt)
+
+# Display the network analysis of symptoms and treatments
+st.subheader("Network Analysis of Symptoms and Treatments")
+plot_network(symptoms)
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Function for behavioral analysis visualization
+def behavioral_analysis(symptoms_data):
+    # Create a simple behavioral score based on smoking and physical activity
+    symptoms_data['Behavioral Score'] = (symptoms_data['smoker'] * 2) + (symptoms_data['activity_limit'] * 1)
+
+    # Plotting the distribution of behavioral scores
+    plt.figure(figsize=(10, 6))
+    sns.histplot(symptoms_data['Behavioral Score'], kde=True, bins=10, color='purple')
+    plt.title("Behavioral Score Distribution (Smoking and Physical Activity)")
+    plt.xlabel("Behavioral Score (Smoking + Activity Limitation)")
+    plt.ylabel("Frequency")
+    st.pyplot(plt)
+
+# Run behavioral analysis for visualization
+st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
+behavioral_analysis(data_cleaned)
