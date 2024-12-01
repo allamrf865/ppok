@@ -67,7 +67,7 @@ def spirometry_classification(fev1_percentage):
         return "Very Severe"
 
 # Load the dataset
-dataset_path = '/mnt/data/copdclean.csv'  # Path to your dataset
+dataset_path = 'Cleaned_COPD_Data.csv'  # Path to your dataset
 data = pd.read_csv(dataset_path)
 
 # Preprocess the data
