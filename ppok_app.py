@@ -210,10 +210,6 @@ def plot_network_analysis(symptoms_data):
     - **Closeness Centrality**: Measures how close a node is to all other nodes. Higher values indicate that the node can reach others more quickly.
     """)
 
-# Display the network analysis of symptoms and treatments
-st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
-plot_network_analysis(data_cleaned)
-
 # Function for behavioral analysis visualization
 def behavioral_analysis(symptoms_data):
     # Create a simple behavioral score based on smoking and physical activity
@@ -283,8 +279,9 @@ if st.button('Predict COPD'):
     st.subheader("Heatmap of Correlations")
     plot_heatmap(data_cleaned)
 
-    st.subheader("Network Analysis of Symptoms and Treatments")
-    plot_network(data_cleaned)
+# Display the network analysis of symptoms and treatments
+st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
+plot_network_analysis(data_cleaned)
 
     st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
     behavioral_analysis(data_cleaned)
