@@ -92,7 +92,7 @@ st.subheader("Cleaned COPD Data")
 st.write(data_cleaned)
 
 # Input questions for respiratory symptoms
-st.title('COPD Detection and Management System - AI by Allam Rafi FKUi 2022')
+st.title('COPD Detection and Management System - AI by Allam Rafi FKUI 2022')
 
 st.header('Enter Patient Symptoms and Information')
 age = st.number_input('Age:', min_value=0, max_value=100, value=60)
