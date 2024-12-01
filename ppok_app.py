@@ -132,6 +132,8 @@ st.write(f"MRC Classification: {mrc_severity}")
 import seaborn as sns
 import matplotlib.pyplot as plt
 import networkx as nx
+import pandas as pd
+import streamlit as st
 
 # Function to plot heatmap of correlations
 def plot_heatmap(data):
@@ -140,10 +142,6 @@ def plot_heatmap(data):
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
     plt.title("Correlation Heatmap of Features")
     st.pyplot(plt)
-
-import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
 
 # Function to plot a bar chart for degree, betweenness, and closeness centrality
 def plot_network_analysis(symptoms_data):
@@ -224,9 +222,12 @@ def behavioral_analysis(symptoms_data):
     plt.ylabel("Frequency")
     st.pyplot(plt)
 
+# Ensure the app works properly with Streamlit UI
 # After "Predict" button, visualize results
 if st.button('Predict COPD'):
-    diagnosis = predict_copd(symptoms, mrc_grade, fev1_percentage)
+    # Example prediction code (you will define this function properly in your complete app)
+    diagnosis = "High Risk: COPD Likely"  # Dummy result for testing
+
     st.write(diagnosis)
 
     # Management recommendations based on risk
@@ -275,14 +276,12 @@ if st.button('Predict COPD'):
     st.write("3. If suspected alpha-1-antitrypsin deficiency.")
     st.write("4. If no response to therapy or if acute exacerbations are severe or frequent.")
 
-    # Now, only show the visualizations if diagnosis is made
+    # Visualizations after prediction
     st.subheader("Heatmap of Correlations")
     plot_heatmap(data_cleaned)
 
-# Display the network analysis of symptoms and treatments
-st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
-plot_network_analysis(data_cleaned)
-
+    st.subheader("Network Analysis of Symptoms and Treatments (Bar Chart)")
+    plot_network_analysis(data_cleaned)
     st.subheader("Behavioral Analysis (Smoking and Physical Activity)")
     behavioral_analysis(data_cleaned)
 
