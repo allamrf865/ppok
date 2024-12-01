@@ -5,4 +5,3 @@ streamlit
 seaborn
 matplotlib
 networkx
-pickle5
